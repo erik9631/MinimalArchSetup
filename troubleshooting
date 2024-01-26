@@ -1,0 +1,8 @@
+# Asus zenbook
+    - Was giving me dbus errors for pipewire in the systemctl logs. Installing sof-firmware fixed it
+    - pipewire uses rtkit to get realtime scheduling, but it's not installed by default. Installing it fixed errors
+    - In case of audio fade bug
+        /etc/modprobe.d/disablePower.conf
+      options snd_hda_intel power_save=0
+    and reboot.
+    if you have a power saving daemon like TLP or laptop-mode-tools they will have their own config for this, disable that there in case

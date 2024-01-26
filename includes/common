@@ -1,0 +1,16 @@
+#!/bin/bash
+ask_for_confirmation(){
+  local confirmation
+  read -r -p "$1 (y/N) " confirmation
+
+  case $confirmation in
+    [yY][eE][sS]|[yY])
+        return 0
+        ;;
+    *)
+        echo "Operation cancelled by user."
+        return 1
+        ;;
+  esac
+}
+export -f ask_for_confirmation

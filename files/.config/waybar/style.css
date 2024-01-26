@@ -1,0 +1,78 @@
+* {
+    /* `otf-font-awesome` is required to be installed for icons */
+    font-family: FontAwesome, sans-serif;
+    font-size: 13px;
+}
+
+window#waybar {
+    background: rgba(100, 0, 0, 0.0);
+}
+
+#workspaces button {
+    padding: 0 5px;
+}
+
+#workspaces button:hover {
+    background: rgba(100, 100, 100, 0.15);
+    border-radius: 2px;
+}
+
+#workspaces {
+    background-color: rgba(10, 10, 24, 0.8);
+    border-radius: 8px 8px 8px 8px; /* Top-left, top-right, bottom-right, bottom-left */
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-top: 5px;
+}
+
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#backlight,
+#network,
+#tray,
+#pulseaudio {
+    padding-left: 10px;
+    padding-right: 10px;
+
+    background-color: rgba(10, 10, 24, 0.8);
+    margin-top: 5px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: #eb4d4b;
+}
+
+
+#clock{
+    margin-right: 10px;
+    border-top-right-radius:8px;
+    border-bottom-right-radius: 8px;
+}
+
+#memory{
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    margin-left: 10px;
+}
+
+#network{
+    border-radius: 8px 0 0 8px; /* Top-left, top-right, bottom-right, bottom-left */
+}
+
+#battery{
+    border-radius: 0px 8px 8px 0px; /* Top-left, top-right, bottom-right, bottom-left */
+    padding-right: 18px;
+}
+
+#pulseaudio{
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}

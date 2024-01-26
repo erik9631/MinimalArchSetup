@@ -1,0 +1,145 @@
+#!/bin/bash
+# shellcheck source=../includes/common
+source "$SCRIPT_DIR/includes/common"
+
+# Check for Internet connectivity
+is_internet_connected() {
+  if ! ping -c 1 -W 15 1.1.1.1 &> /dev/null; then
+      echo "No Internet connection detected."
+      return 1
+  fi
+  sleep 1
+}
+export -f is_internet_connected
+
+function select_wireless_interface() {
+    # Find available wireless interfaces
+    local interfaces
+    local selection
+    mapfile -t interfaces < <(iw dev | grep Interface | tr -s ' ' | awk '{print $2}')
+
+
+    if [ ${#interfaces[@]} -eq 0 ]; then
+        echo "No wireless interfaces found." >&2
+        return 2
+    fi
+
+    echo "Available wireless interfaces: " >&2
+    local interface_count=0
+    local interface
+    for interface in "${interfaces[@]}"; do
+        echo "[$interface_count] $interface" >&2
+        ((interface_count++))
+    done
+
+    # Prompt the user to select a wireless interface
+    read -r -p "Select the wireless interface to use [0-$((interface_count-1))]: " selection
+
+    # Validate the input
+    if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -ge "$interface_count" ]; then
+        echo "Invalid selection." >&2
+        return 1
+    fi
+
+    # Return the selected wireless interface
+    echo "${interfaces[$selection]}"
+}
+export -f select_wireless_interface
+
+function select_wireless_network() {
+    if [ -z "$1" ]; then
+        echo "No interface provided."
+        return 1
+    fi
+
+    local interface=$1
+    local networks
+    mapfile -t networks < <(iw dev "$interface" scan | grep -E 'SSID: .+?$' | sed 's/^.*SSID: //')
+
+    if [ ${#networks[@]} -eq 0 ]; then
+        echo "No wireless networks found." >&2
+        return 1
+    fi
+
+    echo "Available wireless networks:" >&2
+    local i=0
+    for ssid in "${networks[@]}"; do
+        echo "[$i] $ssid" >&2
+        ((i++))
+    done
+
+    # Prompt the user to select a wireless network
+    local selection
+    read -rp "Select the wireless network to use [0-$((i-1))]: " selection
+
+    # Validate the input
+    if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -ge "$i" ]; then
+        echo "Invalid selection." >&2
+        return 1
+    fi
+
+    # Return the selected wireless network SSID
+    echo "${networks[$selection]}"
+}
+export -f select_wireless_network
+
+function connect_to_wireless_network(){
+  local interface_name=$1
+  local ssid=$2
+  local password
+  read -sp "Enter the password for $ssid: " password
+  iwctl --passphrase "$password" station "$interface_name" connect "$ssid"
+}
+export -f connect_to_wireless_network
+
+function handle_internet_connection() {
+  local wireless_interface_name
+  local wireless_network_ssid
+  if is_internet_connected; then
+    echo "Internet connection detected." >&2
+    sleep 1
+    return 0
+  fi
+
+  echo "No Internet connection detected." >&2
+  if ! ask_for_confirmation "Do you want to try to connect to a wireless network?"; then
+    echo "Aborting. Please configure network connectivity manually and run the script again." >&2
+    return 1
+  fi
+
+  if ! wireless_interface_name=$(select_wireless_interface); then
+    echo "Aborting. Please configure network connectivity manually and run the script again." >&2
+    return 1
+  fi
+
+  echo "Selected wireless interface: $wireless_interface_name"
+
+  while ! wireless_network_ssid=$(select_wireless_network "$wireless_interface_name"); do
+    echo "Wireless network selection error" >&2
+    if ! ask_for_confirmation "Do you want to try again?"; then
+      echo "Aborting. Please configure network connectivity manually and run the script again." >&2
+      return 1
+    fi
+  done
+
+
+  while ! connect_to_wireless_network "$wireless_interface_name" "$wireless_network_ssid"; do
+    echo "Wireless network connection error" >&2
+    if ! ask_for_confirmation "Do you want to try again?"; then
+      echo "Aborting. Please configure network connectivity manually and run the script again." >&2
+      return 1
+    fi
+  done
+
+  echo 'Waiting for network to stabilize...' >&2
+  sleep 5
+
+  if ! is_internet_connected; then
+    echo "Error: Internet connection failed." >&2
+    echo "Aborting. Please configure network connectivity manually and run the script again." >&2
+    return 1
+  fi
+
+  echo 'Wireless network connection successful.' >&2
+}
+export -f handle_internet_connection

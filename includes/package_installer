@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+function export_package_group(){
+  local group_name
+  local list_name
+  local clean_package_list
+  group_name=$1
+  list_name=$2
+
+  clean_package_list=$(sed -E 's/( *)#.*$|^( |	)+$//' < "$SCRIPT_DIR"/packages/"$list_name".lst | sed '/^[[:space:]]*$/d' |cut -d' ' -f1)
+  echo "$clean_package_list" | awk "/^\[$group_name\]/{read=1;next}/\\[/{read=0}read{print}"
+}
+
+function install_pacman_packages(){
+  local group_name
+  local package_list
+  group_name=$1
+  readarray -t package_list <<< "$(export_package_group "$group_name" "pacman")"
+
+  sudo pacman -S --needed --noconfirm "${package_list[@]}"
+
+}

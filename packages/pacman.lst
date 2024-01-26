@@ -1,0 +1,48 @@
+[stage0]
+vim
+dhcpcd
+iwd
+iw
+sudo
+rtkit
+bluez
+bluez-utils
+networkmanager
+
+[stage1]
+wayland # Display server
+
+# System tools
+zip
+unzip
+htop # System monitor
+grim # Screenshot tool
+slurp # Screenshot tool
+wl-clipboard # Clipboard manager
+kitty # Terminal emulator
+
+# Daemons
+dunst #Notification daemon
+pipewire # Audio server
+pipewire-pulse # Pulseaudio support for pipewire
+pipewire-jack # Jack support for pipewire
+pipewire-alsa # Alsa support for pipewire
+xdg-desktop-portal-hyprland # It’s used for stuff like e.g. opening file pickers, screen sharing.
+polkit-kde-agent # Authentication Agent asking you for a password whenever an app wants to elevate its privileges.
+
+# Visual
+waybar
+qt4ct
+qt5ct
+qt6ct
+papirus-icon-theme
+kvantum
+nerd-fonts
+
+# Gui Apps
+thunar
+thunar-archive-plugin
+kate
+pavucontrol
+blueman
+network-manager-applet
