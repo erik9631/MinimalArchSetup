@@ -2,7 +2,7 @@
 # shellcheck source=utils
 source "$SCRIPT_DIR/includes/utils"
 
-function copy_scripts() {
+function copy_bin() {
     if ! sudo cp -rv "$SCRIPT_DIR"/files/scripts/* $1; then
         echo "Failed to copy scripts to $1" >&2
         return 1
@@ -23,12 +23,22 @@ function copy_network_manager_configs(){
 # Copy cappuccino rofi theme
 function copy_rofi_usr_theme(){
   # .config part will be copied along with everything else later
-  if ! cp -rfv "$SCRIPT_DIR"/files/system/usr/share/rofi/themes/* /usr/share/rofi/themes/; then
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/usr/share/rofi/themes/* /usr/share/rofi/themes/; then
     echo "Failed to copy rofi theme to /usr/share/rofi/themes/" >&2
     return 1
   fi
 }
 
-function copy_quantum_theme(){
+function copy_modprobe(){
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/modprobe/* /etc/modprobe.d/; then
+    echo "Failed to copy modprobe configs to /etc/modprobe.d/" >&2
+    return 1
+  fi
+}
 
+function copy_dots(){
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/user/.config/* "$HOME"/.config/; then
+    echo "Failed to copy dotfiles to $HOME/.config/" >&2
+    return 1
+  fi
 }

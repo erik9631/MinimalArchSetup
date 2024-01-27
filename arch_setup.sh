@@ -11,6 +11,9 @@ source "$SCRIPT_DIR/includes/network"
 # shellcheck source=includes/utils
 source "$SCRIPT_DIR/includes/utils"
 
+# shellcheck source=includes/copy
+source "$SCRIPT_DIR/includes/copy"
+
 # shellcheck source=includes/package_installer
 source "$SCRIPT_DIR/includes/package_installer"
 
@@ -163,7 +166,32 @@ stage_one(){
 # User specific services
 stage_two(){
   if ! install_yay_packages "stage2"; then
-    echo "installing yay packages failed"
+    echo "installing yay packages failed" >&2
+    exit 1
+  fi
+
+  if ! copy_network_manager_configs; then
+    echo "Copying network configuration failed" >&2
+    exit 1
+  fi
+
+  if ! copy_bin; then
+    echo "Copying scripts failed" >&2
+    exit 1
+  fi
+
+  if ! copy_rofi_usr_theme; then
+    echo "Copying rofi user theme failed" >&2
+    exit 1
+  fi
+
+  if ! copy_modprobe; then
+    echo "Copying modrpobe failed0." >&2
+    exit 1
+  fi
+
+  if ! copy_dots; then
+    echo "Copying modrpobe failed0." >&2
     exit 1
   fi
 
