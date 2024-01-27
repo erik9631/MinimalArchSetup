@@ -112,6 +112,7 @@ stage_zero(){
   usermod -aG wheel \"\$username\"
   usermod -aG lp \"\$username\"
   usermod -aG dbus \"\$username\"
+  usermod -aG input \"\$username\"
   sed -i '/^#\s*%wheel ALL=(ALL:ALL) NOPASSWD: ALL/s/^# //' /etc/sudoers
 
 

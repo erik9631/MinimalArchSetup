@@ -33,7 +33,6 @@ polkit-kde-agent # Authentication Agent asking you for a password whenever an ap
 
 # Visual
 waybar
-qt4ct
 qt5ct
 qt6ct
 papirus-icon-theme
