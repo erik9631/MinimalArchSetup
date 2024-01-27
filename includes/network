@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck source=utils
-source "$SCRIPT_DIR/includes/common"
+source "$SCRIPT_DIR/includes/utils"
 
 # Check for Internet connectivity
 is_internet_connected() {

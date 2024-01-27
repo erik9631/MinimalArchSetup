@@ -3,12 +3,12 @@
 source "$SCRIPT_DIR/includes/utils"
 
 function copy_bin() {
-    if ! sudo cp -rv "$SCRIPT_DIR"/files/scripts/* $1; then
-        echo "Failed to copy scripts to $1" >&2
+    if ! sudo cp -rv "$SCRIPT_DIR"/files/scripts/* /bin/; then
+        echo "Failed to copy scripts to /bin/" >&2
         return 1
     fi
 }
-export -f copy_scripts
+export -f copy_bin
 
 
 # copy /etc/NetworkManager/wifi_backend.conf to /etc/NetworkManager/conf.d/wifi_backend.conf

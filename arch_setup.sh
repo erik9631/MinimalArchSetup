@@ -1,5 +1,6 @@
 #!/bin/bash
 SCRIPT_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
+export SCRIPT_DIR
 
 #TODO
 # Add nvidia drivers script
@@ -62,7 +63,7 @@ stage_zero(){
   genfstab -U /mnt >> /mnt/etc/fstab
   
   echo "Moving script to /mnt/opt/"
-  cp -r "$SCRIPT_DIR"/. /mnt/opt/install/
+  cp -rv "$SCRIPT_DIR"/. /mnt/opt/install/
   sudo chmod -R 777 /mnt/opt/install/
 
   echo "Copying network configuration..."
@@ -81,6 +82,9 @@ stage_zero(){
   export hostname
   export password
   export username
+
+  stage0_packages_str="$(export_package_group "stage0" "pacman")"
+  export stage0_packages_str
   
   echo "Changing rootdir"
   arch-chroot /mnt /bin/bash -c "
@@ -88,9 +92,15 @@ stage_zero(){
 
   # Sync pacman database
   pacman -Syy
+  pacman -S --noconfirm sudo
+  readarray -t stage0_packages <<< \"\${stage0_packages_str}\"
+
 
   # Install basic packages
-  install_pacman_packages \"stage0\"
+  if ! install_pacman_packages \"\${stage0_packages[@]}\"; then
+    echo \"Failed to install pacman packages\" >&2
+    exit 1
+  fi
   
   # Setup etc/host
   echo \"\$hostname\" > /etc/hostname
@@ -131,7 +141,7 @@ stage_zero(){
   echo 'Stage 0 complete, rebooting into the system to run stage 1...'
   "
   sleep 5
-  reboot
+  # reboot
 }
 
 stage_one(){
@@ -145,7 +155,10 @@ stage_one(){
 
   sudo pacman -Syy
   # Install file manager
-  if ! install_pacman_packages "stage1"; then
+  local stage1_packages
+  readarray -t stage1_packages <<< "$(export_package_group "stage1" "pacman")"
+
+  if ! install_pacman_packages "${stage1_packages[@]}"; then
     echo "Failed to install pacman packages"
     exit 1
   fi
@@ -165,7 +178,9 @@ stage_one(){
 
 # User specific services
 stage_two(){
-  if ! install_yay_packages "stage2"; then
+  local stage2_yay_packages
+  readarray -t stage2_yay_packages <<< "$(export_package_group "stage2" "yay")"
+  if ! install_yay_packages "${stage2_yay_packages[@]}"; then
     echo "installing yay packages failed" >&2
     exit 1
   fi
@@ -227,7 +242,7 @@ case $stage in
     stage_two
     ;;
   test_package_installer)
-    readarray -t package_list <<< "$(export_package_group "stage2" "yay")"
+    readarray -t package_list <<< "$(export_package_group "stage0" "pacman")"
     printf "%s\n" "${package_list[@]}"
     ;;
 	*)

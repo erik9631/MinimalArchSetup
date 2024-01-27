@@ -37,9 +37,7 @@ export -f export_package_group
 
 function install_pacman_packages(){
   local group_name
-  local package_list
-  group_name=$1
-  readarray -t package_list <<< "$(export_package_group "$group_name" "pacman")"
+  local package_list=("$@")
   if ! sudo pacman -S --needed --noconfirm "${package_list[@]}"; then
     echo "Failed to install packages from group $group_name" >&2
     return 1
@@ -49,9 +47,7 @@ export -f install_pacman_packages
 
 function install_yay_packages(){
   local group_name
-  local package_list
-  group_name=$1
-  readarray -t package_list <<< "$(export_package_group "$group_name" "yay")"
+  local package_list=("$@")
   if yay -S --needed --noconfirm "${package_list[@]}"; then
     echo "Failed to install packages from group $group_name" >&2
     return 1
