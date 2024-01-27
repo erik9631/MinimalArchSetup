@@ -1,0 +1,19 @@
+#!/bin/bash
+
+function get_best_display_config(){
+  local displays
+  displays=$(xrandr --query | tr -s ' ' | sed -E 's/^ //' | cut -d ' ' -f1-2)
+  echo -e "$displays" | awk '
+  /^.+ connected/{
+    foundDisplay=$1;
+    next;
+  }
+  foundDisplay && /(\*\+)|(\+\*)/{
+  if(match($0, /([0-9]+x[0-9]+) ([0-9.,]+)/, groups)){
+    printf("%s, %s@%s, 0x0, 1.0\n", foundDisplay, groups[1], groups[2])
+    foundDisplay="";
+  }
+  }
+  '
+}
+export -f get_best_display_config

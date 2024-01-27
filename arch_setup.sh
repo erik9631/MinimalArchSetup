@@ -21,6 +21,9 @@ source "$SCRIPT_DIR/includes/package_installer"
 # shellcheck source=includes/bootloader
 source "$SCRIPT_DIR/includes/bootloader"
 
+# shellcheck source=includes/display
+source "$SCRIPT_DIR/includes/display"
+
 # clone github.com/catppuccin/Kvantum and install the theme
 
 stage_zero(){
@@ -213,13 +216,18 @@ stage_two(){
   fi
 
   if ! copy_modprobe; then
-    echo "Copying modrpobe failed0." >&2
+    echo "Copying modrpobe failed." >&2
     exit 1
   fi
 
   if ! copy_dots; then
-    echo "Copying modrpobe failed0." >&2
+    echo "Copying modrpobe failed." >&2
     exit 1
+  fi
+
+  if ! get_best_display_config > "$HOME"/.config/hypr/monitors.conf; then
+    echo "Getting best display config failed" >&2
+    sleep 2
   fi
 
   echo "Performing cleanup..."
@@ -256,6 +264,9 @@ case $stage in
   test_package_installer)
     readarray -t package_list <<< "$(export_package_group "stage0" "pacman")"
     printf "%s\n" "${package_list[@]}"
+    ;;
+  test_best_display_config)
+    get_best_display_config
     ;;
 	*)
 		echo "Invalid stage specified. Please use --stage <0,1,2>"
