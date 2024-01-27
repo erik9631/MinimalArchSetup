@@ -1,7 +1,9 @@
 #!/bin/bash
+# shellcheck source=utils
+source "$SCRIPT_DIR/includes/utils"
 
 function copy_scripts() {
-    if ! sudo cp -r "$SCRIPT_DIR"/files/scripts/* $1; then
+    if ! sudo cp -rv "$SCRIPT_DIR"/files/scripts/* $1; then
         echo "Failed to copy scripts to $1" >&2
         return 1
     fi
@@ -12,5 +14,21 @@ export -f copy_scripts
 # copy /etc/NetworkManager/wifi_backend.conf to /etc/NetworkManager/conf.d/wifi_backend.conf
 # copy /etc/NetworkManager/dhcp-client.conf to /etc/NetworkManager/conf.d/wifi_backend.conf
 function copy_network_manager_configs(){
-  cp -rf "$SCRIPT_DIR"/files/system/etc/NetworkManager/* /etc/NetworkManager/conf.d/
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/NetworkManager/* /etc/NetworkManager/conf.d/; then
+    echo "Failed to copy NetworkManager configs to /etc/NetworkManager/conf.d/" >&2
+    return 1
+  fi
+}
+
+# Copy cappuccino rofi theme
+function copy_rofi_usr_theme(){
+  # .config part will be copied along with everything else later
+  if ! cp -rfv "$SCRIPT_DIR"/files/system/usr/share/rofi/themes/* /usr/share/rofi/themes/; then
+    echo "Failed to copy rofi theme to /usr/share/rofi/themes/" >&2
+    return 1
+  fi
+}
+
+function copy_quantum_theme(){
+
 }

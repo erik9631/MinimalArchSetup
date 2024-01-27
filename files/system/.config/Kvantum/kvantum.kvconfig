@@ -1,6 +1,2 @@
 [General]
 theme=Catppuccin-Mocha-Blue
-
-[Applications]
-Catppuccin-Mocha-Mauve=kate
-Default=kate

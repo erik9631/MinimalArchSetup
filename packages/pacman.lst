@@ -8,6 +8,7 @@ rtkit
 bluez
 bluez-utils
 networkmanager
+git
 
 [stage1]
 wayland # Display server

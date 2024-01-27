@@ -47,3 +47,19 @@ get_current_stage_from_var() {
     fi
 }
 export -f get_current_stage_from_var
+
+git_get_files_from_url(){
+  local url=$1
+  local git_dir
+  git_dir=$(mktemp -d git-XXXXXXXXXX)
+  local archive="$git_dir/archive.tar.gz"
+  if ! wget -O "$archive" "$url"; then
+    echo "Error: Failed to download files from $url" >&2
+    return 1
+  fi
+  if ! tar xvzf "$archive" -C "$git_dir" --strip-components=1; then
+    echo "Error: Failed to extract files from $archive" >&2
+    return 2
+  fi
+  echo "$git_dir"
+}

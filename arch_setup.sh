@@ -2,9 +2,6 @@
 SCRIPT_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
 
 #TODO
-# Install catpucino rofi theme --- also done manually
-# Install kvantum theme --- Done mannually
-# Autostart the polkit-kde-agent
 # Add nvidia drivers script
 # Add script that installs firmware based on the laptop model
 
@@ -206,7 +203,7 @@ case $stage in
     printf "%s\n" "${package_list[@]}"
     ;;
 	*)
-		echo "Invalid stage specified. Please use --stage 0 or --stage 1."
+		echo "Invalid stage specified. Please use --stage <0,1,2>"
 		exit 1
 		;;
 esac
