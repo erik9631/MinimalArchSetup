@@ -1,5 +1,27 @@
 #!/bin/bash
 
+install_yay_for_all() {
+  local yay_dir
+
+  if [[ $EUID -eq 0 ]]; then
+    echo "This script should not be run as root." >&2
+    return 1
+  fi
+  # Install required packages for building from AUR
+  sudo pacman -Sy --noconfirm --needed base-devel git
+
+  # Clone yay repository to a temporary directory
+  yay_dir=$(mktemp -d)
+  git clone https://aur.archlinux.org/yay.git "$yay_dir"
+  pushd "$yay_dir" || return 1
+  makepkg -si --noconfirm --needed
+  popd || return 1
+  # Cleanup the source directory
+  rm -rf "$yay_dir"
+
+  echo "yay is now available for all users." >&2
+}
+export -f install_yay_for_all
 
 function export_package_group(){
   local group_name
@@ -11,13 +33,28 @@ function export_package_group(){
   clean_package_list=$(sed -E 's/( *)#.*$|^( |	)+$//' < "$SCRIPT_DIR"/packages/"$list_name".lst | sed '/^[[:space:]]*$/d' |cut -d' ' -f1)
   echo "$clean_package_list" | awk "/^\[$group_name\]/{read=1;next}/\\[/{read=0}read{print}"
 }
+export -f export_package_group
 
 function install_pacman_packages(){
   local group_name
   local package_list
   group_name=$1
   readarray -t package_list <<< "$(export_package_group "$group_name" "pacman")"
-
-  sudo pacman -S --needed --noconfirm "${package_list[@]}"
-
+  if ! sudo pacman -S --needed --noconfirm "${package_list[@]}"; then
+    echo "Failed to install packages from group $group_name" >&2
+    return 1
+  fi
 }
+export -f install_pacman_packages
+
+function install_yay_packages(){
+  local group_name
+  local package_list
+  group_name=$1
+  readarray -t package_list <<< "$(export_package_group "$group_name" "yay")"
+  if yay -S --needed --noconfirm "${package_list[@]}"; then
+    echo "Failed to install packages from group $group_name" >&2
+    return 1
+  fi
+}
+export -f install_yay_packages

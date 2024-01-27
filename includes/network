@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck source=../includes/common
+# shellcheck source=utils
 source "$SCRIPT_DIR/includes/common"
 
 # Check for Internet connectivity
@@ -143,3 +143,10 @@ function handle_internet_connection() {
   echo 'Wireless network connection successful.' >&2
 }
 export -f handle_internet_connection
+
+enable_network(){
+  systemctl enable dhcpcd
+  systemctl enable iwd
+}
+export -f enable_network
+

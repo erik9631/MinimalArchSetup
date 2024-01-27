@@ -1,0 +1,89 @@
+#!/bin/bash
+
+
+get_boot_mode() {
+    if [ -f "/sys/firmware/efi/fw_platform_size" ]; then
+        echo "UEFI"
+    else
+        echo "BIOS"
+    fi
+}
+export -f get_boot_mode
+
+get_grub_target() {
+    local architecture boot_mode target
+    architecture=$(uname -m)
+    boot_mode=$(get_boot_mode)
+
+    case "$architecture" in
+        # ARM architectures
+        arm*)
+            target="arm-uboot"
+            ;;
+        aarch64)
+            target="arm64-efi"
+            ;;
+        # x86 architectures
+        i*86)
+            if [[ "$boot_mode" == "UEFI" ]]; then
+                target="i386-efi"
+            else
+                target="i386-pc"
+            fi
+            ;;
+        x86_64)
+            if [[ "$boot_mode" == "UEFI" ]]; then
+                target="x86_64-efi"
+            else
+                # Assuming BIOS mode
+                target="i386-pc"
+            fi
+            ;;
+        # Unknown architecture
+        *)
+            echo "Unknown architecture: $architecture" >&2
+            return 1
+            ;;
+    esac
+
+    echo "$target"
+}
+export -f get_grub_target
+
+
+install_and_configure_grub() {
+  set -e
+  echo "Installing GRUB bootloader..."
+  pacman -S --noconfirm grub efibootmgr
+  local target
+  local confirmation
+  target=$(get_grub_target)
+
+  if [[ $? != 0 ]]; then
+    echo "Unknown architecture"
+    exit 1
+  fi
+
+  echo "grub target is: $target"
+
+  if ! ask_for_confirmation "Is this the correct target?"; then
+    exit 1
+  fi
+
+  if grub-install --target="$target" --efi-directory=/boot --bootloader-id=GRUB; then
+    echo "GRUB installed successfully."
+  else
+    echo "GRUB installation failed." >&2
+    exit 1
+  fi
+
+  if grub-mkconfig -o /boot/grub/grub.cfg; then
+    echo "GRUB configuration generated successfully."
+  else
+    echo "GRUB configuration generation failed." >&2
+    exit 1
+  fi
+
+  echo "GRUB installation and configuration complete."
+}
+export -f install_and_configure_grub

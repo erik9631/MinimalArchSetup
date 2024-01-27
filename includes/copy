@@ -1,0 +1,16 @@
+#!/bin/bash
+
+function copy_scripts() {
+    if ! sudo cp -r "$SCRIPT_DIR"/files/scripts/* $1; then
+        echo "Failed to copy scripts to $1" >&2
+        return 1
+    fi
+}
+export -f copy_scripts
+
+
+# copy /etc/NetworkManager/wifi_backend.conf to /etc/NetworkManager/conf.d/wifi_backend.conf
+# copy /etc/NetworkManager/dhcp-client.conf to /etc/NetworkManager/conf.d/wifi_backend.conf
+function copy_network_manager_configs(){
+  cp -rf "$SCRIPT_DIR"/files/system/etc/NetworkManager/* /etc/NetworkManager/conf.d/
+}

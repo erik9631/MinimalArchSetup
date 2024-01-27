@@ -1,0 +1,49 @@
+#!/bin/bash
+ask_for_confirmation(){
+  local confirmation
+  read -r -p "$1 (y/N) " confirmation
+
+  case $confirmation in
+    [yY][eE][sS]|[yY])
+        return 0
+        ;;
+    *)
+        echo "Operation cancelled by user."
+        return 1
+        ;;
+  esac
+}
+export -f ask_for_confirmation
+
+is_time_synced(){
+  local sync_status
+  # Parse synchronization status and return error if not synchronized
+  sync_status=$(timedatectl show --property=NTPSynchronized --value)
+  if [ "$sync_status" != "yes" ]; then
+      echo "Error: Time synchronization failed, NTPSynchronized is set to $sync_status" >&2
+      return 1
+  fi
+}
+export -f is_time_synced
+
+# Function for checking if the user is root
+check_root_user() {
+  if [ "$(id -u)" != "0" ]; then
+    echo "Error: This script must be run as root"
+    exit 1
+  fi
+}
+export -f check_root_user
+
+get_current_stage_from_var() {
+    local stage
+    stage=$(ls /var/install | grep -Eo 'stage[0-9]' | grep -Eo '[0-9]')
+
+    if [[ -n $stage ]]; then
+        echo "$stage"
+    else
+        >&2 echo "No stage found."
+        return 1  # Return an error code if no stage is found.
+    fi
+}
+export -f get_current_stage_from_var
