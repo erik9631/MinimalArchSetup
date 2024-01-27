@@ -164,6 +164,17 @@ stage_one(){
     exit 1
   fi
 
+  echo "Installing additional model specific packages..."
+  local model_name
+  local model_packages
+  model_name=$(cat /sys/devices/virtual/dmi/id/product_name)
+  readarray -t model_packages <<< "$(export_package_group "$model_name" "pacman")"
+
+  if ! install_pacman_packages "${model_packages[@]}"; then
+    echo "Failed to install model specific packages"
+    sleep 5
+  fi
+
   if ! install_yay_for_all; then
     echo "yay installation failed"
     exit 1

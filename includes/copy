@@ -41,4 +41,9 @@ function copy_dots(){
     echo "Failed to copy dotfiles to $HOME/.config/" >&2
     return 1
   fi
+
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/.config/* /etc/skel/; then
+    echo "Failed to copy dotfiles to /etc/skel" >&2
+    return 1
+  fi
 }
