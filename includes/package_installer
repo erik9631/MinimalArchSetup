@@ -48,7 +48,7 @@ export -f install_pacman_packages
 function install_yay_packages(){
   local group_name
   local package_list=("$@")
-  if yay -S --needed --noconfirm "${package_list[@]}"; then
+  if ! yay -S --needed --noconfirm "${package_list[@]}"; then
     echo "Failed to install packages from group $group_name" >&2
     return 1
   fi

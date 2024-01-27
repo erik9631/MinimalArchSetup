@@ -2,7 +2,6 @@
 hyprland # Window manager
 Hyprpicker # Color picking tool
 waypaper # Wallpaper manager
-libfuse2 # Mandatory lib for running fuse based apps
 swww # Background backend
 nwg-look # GTK theme switcher
 nwg-displays # Display manager
@@ -10,6 +9,3 @@ wlr-randr # Manages outputs from wayland. Depedency for nwg-displays
 google-chrome # Browser
 rofi-lbonn-wayland-git # Rofi wayland fork
 catppuccin-gtk-theme-mocha
-catppuccin-gtk-theme-macchiato
-catppuccin-gtk-theme-frappe
-catppuccin-gtk-theme-latte

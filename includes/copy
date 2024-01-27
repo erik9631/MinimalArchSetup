@@ -37,7 +37,7 @@ function copy_modprobe(){
 }
 
 function copy_dots(){
-  if ! sudo cp -rfv "$SCRIPT_DIR"/files/user/.config/* "$HOME"/.config/; then
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/.config/* "$HOME"/.config/; then
     echo "Failed to copy dotfiles to $HOME/.config/" >&2
     return 1
   fi

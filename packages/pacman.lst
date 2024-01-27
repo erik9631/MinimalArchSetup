@@ -33,11 +33,14 @@ polkit-kde-agent # Authentication Agent asking you for a password whenever an ap
 
 # Visual
 waybar
+papirus-icon-theme
+nerd-fonts
+kvantum
+
+# Libs
 qt5ct
 qt6ct
-papirus-icon-theme
-kvantum
-nerd-fonts
+fuse2 # Mandatory lib for running fuse based apps
 
 # Gui Apps
 thunar
