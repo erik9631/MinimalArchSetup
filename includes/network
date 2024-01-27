@@ -145,8 +145,7 @@ function handle_internet_connection() {
 export -f handle_internet_connection
 
 enable_network(){
-  systemctl enable dhcpcd
-  systemctl enable iwd
+  systemctl enable NetworkManager
 }
 export -f enable_network
 
