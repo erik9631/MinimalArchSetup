@@ -201,6 +201,10 @@ stage_one(){
     exit 1
   fi
 
+  systemctl enable --user --now pipewire
+  systemctl enable --user --now pipewire-pulse
+  systemctl enable --user --now wireplumber
+
   echo "Updating stage file..."
   sudo mv /var/install/stage1 /var/install/stage2
 

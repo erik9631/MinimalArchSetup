@@ -3,7 +3,7 @@
 source "$SCRIPT_DIR/includes/utils"
 
 function copy_bin() {
-    if ! sudo cp -rv "$SCRIPT_DIR"/files/scripts/* /bin/; then
+    if ! sudo cp -rfv "$SCRIPT_DIR"/files/bin/. /bin/; then
         echo "Failed to copy scripts to /bin/" >&2
         return 1
     fi
@@ -13,7 +13,7 @@ export -f copy_bin
 
 # After the chroot
 function copy_network_manager_configs(){
-  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/NetworkManager/* /mnt/etc/NetworkManager/; then
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/NetworkManager/. /mnt/etc/NetworkManager/; then
     echo "Failed to copy NetworkManager configs to /etc/NetworkManager/conf.d/" >&2
     return 1
   fi
@@ -23,7 +23,7 @@ export -f copy_network_manager_configs
 # Copy cappuccino rofi theme
 function copy_rofi_usr_theme(){
   # .config part will be copied along with everything else later
-  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/usr/share/rofi/themes/* /usr/share/rofi/themes/; then
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/usr/share/rofi/themes/. /usr/share/rofi/themes/; then
     echo "Failed to copy rofi theme to /usr/share/rofi/themes/" >&2
     return 1
   fi
@@ -32,7 +32,7 @@ export -f copy_rofi_usr_theme
 
 # After the chroot
 function copy_modprobe(){
-  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/modprobe/* /mnt/etc/modprobe.d/; then
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/modprobe/. /mnt/etc/modprobe.d/; then
     echo "Failed to copy modprobe configs to /etc/modprobe.d/" >&2
     return 1
   fi
@@ -40,12 +40,17 @@ function copy_modprobe(){
 export -f copy_modprobe
 
 function copy_dots(){
-  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/.config/* "$HOME"/.config/; then
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/.config/. "$HOME"/.config/; then
     echo "Failed to copy dotfiles to $HOME/.config/" >&2
     return 1
   fi
 
-  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/.config/* /etc/skel/; then
+  if sudo chown -R "$USER" "$HOME"/.config/; then
+    echo "Failed to chown $HOME/.config/" >&2
+    return 1
+  fi
+
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/.config/ /etc/skel/; then
     echo "Failed to copy dotfiles to /etc/skel" >&2
     return 1
   fi
