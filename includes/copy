@@ -19,6 +19,7 @@ function copy_network_manager_configs(){
     return 1
   fi
 }
+export -f copy_network_manager_configs
 
 # Copy cappuccino rofi theme
 function copy_rofi_usr_theme(){
@@ -28,6 +29,7 @@ function copy_rofi_usr_theme(){
     return 1
   fi
 }
+export -f copy_rofi_usr_theme
 
 function copy_modprobe(){
   if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/modprobe/* /etc/modprobe.d/; then
@@ -35,6 +37,7 @@ function copy_modprobe(){
     return 1
   fi
 }
+export -f copy_modprobe
 
 function copy_dots(){
   if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/.config/* "$HOME"/.config/; then
@@ -47,3 +50,4 @@ function copy_dots(){
     return 1
   fi
 }
+export -f copy_dots

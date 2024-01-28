@@ -1,16 +1,16 @@
 #!/bin/bash
-# shellcheck source=includes/stage
-source "$SCRIPT_DIR/includes/stage"
-
 SCRIPT_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
 export SCRIPT_DIR
+
+# shellcheck source=includes/stage
+source "$SCRIPT_DIR/includes/stage"
 
 args=("$@")
 
 stage=0
 stage_arg=0
-shared_boot_kernel=0
-export shared_boot_kernel
+shared_boot=0
+export shared_boot
 
 
 function check_stage(){
@@ -32,8 +32,8 @@ for ((i=0; i<${#args[@]}; i++)); do
         fi
         stage_arg=1
       ;;
-      --shared_boot_kernel)
-        shared_boot_kernel=1
+      --shared_boot)
+        shared_boot=1
         echo "Shared boot kernel enabled. GRUB and KERNEL will not be installed."
         sleep 5
       ;;

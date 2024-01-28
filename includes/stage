@@ -55,7 +55,7 @@ stage_zero(){
 
 
   # Install the linux zen-kernel with firmware
-  if (("$shared_boot_kernel" == 1)); then
+  if (("$shared_boot" == 1)); then
     if ! pacstrap /mnt base linux-firmware; then
       echo "Failed to install linux-firmware." >&2
       exit 1
@@ -138,11 +138,16 @@ stage_zero(){
   fi
   systemctl enable systemd-timesyncd.service
 
-  if (( \"\$shared_boot_kernel\" == 0 )); then
+  if (( \"\$shared_boot\" == 0 )); then
     if ! install_and_configure_grub; then
       echo 'Grub installation failed'
       exit 1
     fi
+  fi
+
+  if ! copy_network_manager_configs; then
+    echo \"Copying network configuration failed\" >&2
+    exit 1
   fi
 
   echo 'Preparing for stage 1...'
@@ -204,11 +209,6 @@ stage_two(){
   readarray -t stage2_yay_packages <<< "$(export_package_group "stage2" "yay")"
   if ! install_yay_packages "${stage2_yay_packages[@]}"; then
     echo "installing yay packages failed" >&2
-    exit 1
-  fi
-
-  if ! copy_network_manager_configs; then
-    echo "Copying network configuration failed" >&2
     exit 1
   fi
 
