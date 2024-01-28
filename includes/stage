@@ -145,17 +145,23 @@ stage_zero(){
     fi
   fi
 
-  if ! copy_network_manager_configs; then
-    echo \"Copying network configuration failed\" >&2
-    exit 1
-  fi
-
   echo 'Preparing for stage 1...'
   mkdir /var/install/
   touch /var/install/stage1
+  "
+
+  if ! copy_network_manager_configs; then
+    echo "Copying network configuration failed" >&2
+    exit 1
+  fi
+
+    if ! copy_modprobe; then
+    echo "Copying modrpobe failed." >&2
+    exit 1
+  fi
+
 
   echo 'Stage 0 complete, rebooting into the system to run stage 1...'
-  "
   sleep 5
   # reboot
 }
@@ -219,11 +225,6 @@ stage_two(){
 
   if ! copy_rofi_usr_theme; then
     echo "Copying rofi user theme failed" >&2
-    exit 1
-  fi
-
-  if ! copy_modprobe; then
-    echo "Copying modrpobe failed." >&2
     exit 1
   fi
 

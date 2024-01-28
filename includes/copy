@@ -11,10 +11,9 @@ function copy_bin() {
 export -f copy_bin
 
 
-# copy /etc/NetworkManager/wifi_backend.conf to /etc/NetworkManager/conf.d/wifi_backend.conf
-# copy /etc/NetworkManager/dhcp-client.conf to /etc/NetworkManager/conf.d/wifi_backend.conf
+# After the chroot
 function copy_network_manager_configs(){
-  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/NetworkManager/* /etc/NetworkManager/conf.d/; then
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/NetworkManager/* /mnt/etc/NetworkManager/; then
     echo "Failed to copy NetworkManager configs to /etc/NetworkManager/conf.d/" >&2
     return 1
   fi
@@ -31,8 +30,9 @@ function copy_rofi_usr_theme(){
 }
 export -f copy_rofi_usr_theme
 
+# After the chroot
 function copy_modprobe(){
-  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/modprobe/* /etc/modprobe.d/; then
+  if ! sudo cp -rfv "$SCRIPT_DIR"/files/system/etc/modprobe/* /mnt/etc/modprobe.d/; then
     echo "Failed to copy modprobe configs to /etc/modprobe.d/" >&2
     return 1
   fi
