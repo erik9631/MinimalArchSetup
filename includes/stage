@@ -1,0 +1,244 @@
+#!/bin/bash
+
+#TODO
+# Add nvidia drivers script
+# Add script that installs firmware based on the laptop model
+
+# shellcheck source=network
+source "$SCRIPT_DIR/includes/network"
+
+# shellcheck source=utils
+source "$SCRIPT_DIR/includes/utils"
+
+# shellcheck source=copy
+source "$SCRIPT_DIR/includes/copy"
+
+# shellcheck source=package_installer
+source "$SCRIPT_DIR/includes/package_installer"
+
+# shellcheck source=bootloader
+source "$SCRIPT_DIR/includes/bootloader"
+
+# shellcheck source=display
+source "$SCRIPT_DIR/includes/display"
+
+# clone github.com/catppuccin/Kvantum and install the theme
+
+stage_zero(){
+  # Check if the script is running as root
+  local is_wireless
+  local connection_state
+  check_root_user
+  if ! connection_state=$(handle_internet_connection); then
+    exit 1
+  fi
+  is_wireless=$(echo "$connection_state" | grep -i -c 'wireless')
+
+  if (( is_wireless )); then
+    echo "Wireless connection detected."
+  else
+    echo "Wired connection detected."
+  fi
+
+  if ! is_time_synced; then
+    echo "Time synchronization failed."
+    exit 1
+  fi
+
+
+  if findmnt -M "/mnt" > /dev/null; then
+    echo "/mnt is mounted. Installing kernel..."
+  else
+    echo "/mnt is not mounted."
+	exit 1
+  fi
+
+
+  # Install the linux zen-kernel with firmware
+  if (("$shared_boot_kernel" == 1)); then
+    if ! pacstrap /mnt base linux-firmware; then
+      echo "Failed to install linux-firmware." >&2
+      exit 1
+    fi
+  else
+    if ! pacstrap -K /mnt base linux-zen linux-firmware; then
+      echo "Failed to install linux-zen and linux-firmware." >&2
+      exit 1
+    fi
+  fi
+
+
+  echo "Generating file system table..."
+  genfstab -U /mnt >> /mnt/etc/fstab
+
+  echo "Moving script to /mnt/opt/"
+  cp -rv "$SCRIPT_DIR"/. /mnt/opt/install/
+  sudo chmod -R 777 /mnt/opt/install/
+
+  echo "Copying network configuration..."
+  if (( is_wireless )); then
+    mkdir -p /mnt/var/lib/iwd && sudo cp -r /var/lib/iwd /mnt/var/lib/
+  fi
+
+  local hostname
+  local username
+  local password
+
+  read -p 'Set your hostname: ' hostname
+  read -p 'Set your username: ' username
+  read -sp 'Set your root password: ' password
+
+  export hostname
+  export password
+  export username
+
+  stage0_packages_str="$(export_package_group "stage0" "pacman")"
+  export stage0_packages_str
+
+  echo "Changing rootdir"
+  arch-chroot /mnt /bin/bash -c "
+
+
+  # Sync pacman database
+  pacman -Syy
+  pacman -S --noconfirm sudo
+  readarray -t stage0_packages <<< \"\${stage0_packages_str}\"
+
+
+  # Install basic packages
+  if ! install_pacman_packages \"\${stage0_packages[@]}\"; then
+    echo \"Failed to install pacman packages\" >&2
+    exit 1
+  fi
+
+  # Setup etc/host
+  echo \"\$hostname\" > /etc/hostname
+  echo \"root:\$password\" | chpasswd
+
+  echo \"Setting up new user...\"
+  useradd -m \$username
+  echo \"\$username:\$password\" | chpasswd
+  usermod -aG wheel \"\$username\"
+  usermod -aG lp \"\$username\"
+  usermod -aG dbus \"\$username\"
+  usermod -aG input \"\$username\"
+  sed -i '/^#\s*%wheel ALL=(ALL:ALL) NOPASSWD: ALL/s/^# //' /etc/sudoers
+
+
+  # Uncomment en_US
+  if ! sed -i '/^#.*en_US.UTF-8/s/^#//' /etc/locale.gen; then
+    echo 'Uncomment failed'
+    exit 1
+  fi
+  locale-gen
+
+  if ! enable_network; then
+    echo 'Enable network failed'
+    exit 1
+  fi
+  systemctl enable systemd-timesyncd.service
+
+  if (( \"\$shared_boot_kernel\" == 0 )); then
+    if ! install_and_configure_grub; then
+      echo 'Grub installation failed'
+      exit 1
+    fi
+  fi
+
+  echo 'Preparing for stage 1...'
+  mkdir /var/install/
+  touch /var/install/stage1
+
+  echo 'Stage 0 complete, rebooting into the system to run stage 1...'
+  "
+  sleep 5
+  # reboot
+}
+
+stage_one(){
+
+  if ! is_internet_connected; then
+    if ! handle_internet_connection; then
+      echo "Internet is not connected. Please connect to the internet and run this script again with --stage 1."
+      exit 1
+    fi
+  fi
+
+  sudo pacman -Syy
+  # Install file manager
+  local stage1_packages
+  readarray -t stage1_packages <<< "$(export_package_group "stage1" "pacman")"
+
+  if ! install_pacman_packages "${stage1_packages[@]}"; then
+    echo "Failed to install pacman packages"
+    exit 1
+  fi
+
+  echo "Installing additional model specific packages..."
+  local model_name
+  local model_packages
+  model_name=$(cat /sys/devices/virtual/dmi/id/product_name)
+  readarray -t model_packages <<< "$(export_package_group "$model_name" "pacman")"
+
+  if ! install_pacman_packages "${model_packages[@]}"; then
+    echo "Failed to install model specific packages"
+    sleep 5
+  fi
+
+  if ! install_yay_for_all; then
+    echo "yay installation failed"
+    exit 1
+  fi
+
+  echo "Updating stage file..."
+  sudo mv /var/install/stage1 /var/install/stage2
+
+  echo "All stage1 installations are complete."
+  echo "Proceeding to stage2..."
+  stage_two
+}
+
+# User specific services
+stage_two(){
+  local stage2_yay_packages
+  readarray -t stage2_yay_packages <<< "$(export_package_group "stage2" "yay")"
+  if ! install_yay_packages "${stage2_yay_packages[@]}"; then
+    echo "installing yay packages failed" >&2
+    exit 1
+  fi
+
+  if ! copy_network_manager_configs; then
+    echo "Copying network configuration failed" >&2
+    exit 1
+  fi
+
+  if ! copy_bin; then
+    echo "Copying scripts failed" >&2
+    exit 1
+  fi
+
+  if ! copy_rofi_usr_theme; then
+    echo "Copying rofi user theme failed" >&2
+    exit 1
+  fi
+
+  if ! copy_modprobe; then
+    echo "Copying modrpobe failed." >&2
+    exit 1
+  fi
+
+  if ! copy_dots; then
+    echo "Copying modrpobe failed." >&2
+    exit 1
+  fi
+
+  if ! get_best_display_config > "$HOME"/.config/hypr/monitors.conf; then
+    echo "Getting best display config failed" >&2
+    sleep 2
+  fi
+
+  echo "Performing cleanup..."
+  sudo rm -rf /opt/install
+  sudo rm -rf /var/install
+  exit 0
+}
