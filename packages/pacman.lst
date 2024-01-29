@@ -24,6 +24,7 @@ kitty # Terminal emulator
 gvfs # Virtual filesystem for thunar
 thunar-volman # Automounting for thunar
 swayidle # Idle manager
+tlp # Power management
 
 # Daemons
 dunst #Notification daemon

@@ -203,6 +203,7 @@ stage_one(){
   systemctl enable --user --now pipewire-pulse
   systemctl enable --user --now wireplumber
   systemctl enable --now bluetooth
+  systemctl enable tlp
 
   echo "Updating stage file..."
   sudo mv /var/install/stage1 /var/install/stage2

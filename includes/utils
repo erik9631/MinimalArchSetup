@@ -15,7 +15,7 @@ ask_for_confirmation(){
 }
 export -f ask_for_confirmation
 
-is_time_synced(){
+function is_time_synced(){
   local sync_status
   # Parse synchronization status and return error if not synchronized
   sync_status=$(timedatectl show --property=NTPSynchronized --value)
@@ -27,7 +27,7 @@ is_time_synced(){
 export -f is_time_synced
 
 # Function for checking if the user is root
-check_root_user() {
+function check_root_user() {
   if [ "$(id -u)" != "0" ]; then
     echo "Error: This script must be run as root"
     exit 1
