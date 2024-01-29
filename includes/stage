@@ -75,11 +75,6 @@ stage_zero(){
   cp -rv "$SCRIPT_DIR"/. /mnt/opt/install/
   sudo chmod -R 777 /mnt/opt/install/
 
-  echo "Copying network configuration..."
-  if (( is_wireless )); then
-    mkdir -p /mnt/var/lib/iwd && sudo cp -r /var/lib/iwd /mnt/var/lib/
-  fi
-
   local hostname
   local username
   local password
@@ -155,7 +150,12 @@ stage_zero(){
     exit 1
   fi
 
-    if ! copy_modprobe; then
+  if ! copy_iwd; then
+    echo "Copying iwd configuration failed" >&2
+    exit 1
+  fi
+
+  if ! copy_modprobe; then
     echo "Copying modrpobe failed." >&2
     exit 1
   fi
@@ -186,14 +186,12 @@ stage_one(){
   fi
 
   echo "Installing additional model specific packages..."
-  local model_name
-  local model_packages
-  model_name=$(cat /sys/devices/virtual/dmi/id/product_name)
-  readarray -t model_packages <<< "$(export_package_group "$model_name" "pacman")"
-
-  if ! install_pacman_packages "${model_packages[@]}"; then
-    echo "Failed to install model specific packages"
-    sleep 5
+  if ! install_model_packages; then
+    echo "Failed to install model specific packages."
+    if ! ask_for_confirmation "Manual installation required. Do you want to continue?"; then
+      echo "Aborting installation."
+      exit 1
+    fi
   fi
 
   if ! install_yay_for_all; then
@@ -204,6 +202,7 @@ stage_one(){
   systemctl enable --user --now pipewire
   systemctl enable --user --now pipewire-pulse
   systemctl enable --user --now wireplumber
+  systemctl enable --now bluetooth
 
   echo "Updating stage file..."
   sudo mv /var/install/stage1 /var/install/stage2
@@ -235,11 +234,6 @@ stage_two(){
   if ! copy_dots; then
     echo "Copying modrpobe failed." >&2
     exit 1
-  fi
-
-  if ! get_best_display_config > "$HOME"/.config/hypr/monitors.conf; then
-    echo "Getting best display config failed" >&2
-    sleep 2
   fi
 
   echo "Performing cleanup..."

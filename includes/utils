@@ -8,7 +8,7 @@ ask_for_confirmation(){
         return 0
         ;;
     *)
-        echo "Operation cancelled by user."
+        echo "Operation cancelled by user." >&2
         return 1
         ;;
   esac
@@ -35,7 +35,7 @@ check_root_user() {
 }
 export -f check_root_user
 
-get_current_stage_from_var() {
+function get_current_stage_from_var() {
     local stage
     stage=$(ls /var/install | grep -Eo 'stage[0-9]' | grep -Eo '[0-9]')
 
@@ -48,7 +48,7 @@ get_current_stage_from_var() {
 }
 export -f get_current_stage_from_var
 
-git_get_files_from_url(){
+function git_get_files_from_url(){
   local url=$1
   local git_dir
   git_dir=$(mktemp -d git-XXXXXXXXXX)
@@ -63,3 +63,17 @@ git_get_files_from_url(){
   fi
   echo "$git_dir"
 }
+export -f get_current_stage_from_var
+
+function install_model_packages(){
+  local model_name
+  local model_packages
+  model_name=$(cat /sys/devices/virtual/dmi/id/product_name)
+  readarray -t model_packages <<< "$(export_package_group "$model_name" "pacman")"
+
+  if ! install_pacman_packages "${model_packages[@]}"; then
+    echo "Failed to install model specific packages"
+    sleep 5
+  fi
+}
+export -f install_model_packages

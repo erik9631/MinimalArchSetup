@@ -21,6 +21,9 @@ grim # Screenshot tool
 slurp # Screenshot tool
 wl-clipboard # Clipboard manager
 kitty # Terminal emulator
+gvfs # Virtual filesystem for thunar
+thunar-volman # Automounting for thunar
+swayidle # Idle manager
 
 # Daemons
 dunst #Notification daemon

@@ -5,6 +5,7 @@ waypaper # Wallpaper manager
 swww # Background backend
 nwg-look # GTK theme switcher
 nwg-displays # Display manager
+swaylock-effects # Lockscreen
 wlr-randr # Manages outputs from wayland. Depedency for nwg-displays
 google-chrome # Browser
 rofi-lbonn-wayland-git # Rofi wayland fork

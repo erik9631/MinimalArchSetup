@@ -37,9 +37,31 @@ for ((i=0; i<${#args[@]}; i++)); do
         echo "Shared boot kernel enabled. GRUB and KERNEL will not be installed."
         sleep 5
       ;;
+      --test_package_installer)
+        i=$((i+1))
+        stage_arg="${args[$i]}"
+        i=$((i+1))
+        package_manager="${args[$i]}"
+        readarray -t package_list <<< "$(export_package_group "$stage_arg" "$package_manager")"
+        printf "%s\n" "${package_list[@]}"
+        exit 0
+      ;;
+      --best_display_config)
+        if ! get_best_display_config > "$HOME"/.config/hypr/monitors.conf; then
+          echo "Getting best display config failed" >&2
+          sleep 2
+        fi
+        exit 0
+      ;;
+      --handle_internet_connection)
+        if ! handle_internet_connection; then
+          exit 1;
+        fi
+        exit 0
+      ;;
       *)
-          echo "Unknown option: $arg"
-          exit 1
+        echo "Unknown option: $arg"
+        exit 1
       ;;
   esac
 done
@@ -64,13 +86,6 @@ case $stage in
 		;;
   2)
     stage_two
-    ;;
-  test_package_installer)
-    readarray -t package_list <<< "$(export_package_group "stage0" "pacman")"
-    printf "%s\n" "${package_list[@]}"
-    ;;
-  test_best_display_config)
-    get_best_display_config
     ;;
 	*)
 		echo "Invalid stage specified. Please use --stage <0,1,2>"
