@@ -5,6 +5,9 @@ export SCRIPT_DIR
 # shellcheck source=includes/stage
 source "$SCRIPT_DIR/includes/stage"
 
+# shellcheck source=includes/utils
+source "$SCRIPT_DIR/includes/utils"
+
 args=("$@")
 
 stage=0
@@ -57,6 +60,16 @@ for ((i=0; i<${#args[@]}; i++)); do
         if ! handle_internet_connection; then
           exit 1;
         fi
+        exit 0
+      ;;
+      --add_resume_hook)
+        if ! add_initramfs_resume_hook; then
+          exit 1;
+        fi
+        exit 0
+      ;;
+      --help)
+        echo "Usage: $0 [--stage <0,1,2>] [--shared_boot] [--best_display_config] [--handle_internet_connection]"
         exit 0
       ;;
       *)

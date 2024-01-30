@@ -64,3 +64,19 @@ function copy_iwd(){
   fi
 }
 export -f copy_iwd
+
+# Copy from home/.gtkrc-2.0 to /etc/skel and $HOME
+function copy_home(){
+
+  if ! sudo cp -rfvT "$SCRIPT_DIR"/files/system/home/ "$HOME"; then
+    echo "Failed to copy .gtkrc-2.0 to /etc/skel/" >&2
+    return 1
+  fi
+
+
+  if ! sudo cp -rfvT "$SCRIPT_DIR"/files/system/home/ /etc/skel/; then
+    echo "Failed to copy .gtkrc-2.0 to /etc/skel/" >&2
+    return 1
+  fi
+}
+export -f copy_home

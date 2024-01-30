@@ -77,3 +77,51 @@ function install_model_packages(){
   fi
 }
 export -f install_model_packages
+
+function add_initramfs_resume_hook(){
+  sed -i '/^HOOKS=/s/\$)/ resume\)' /etc/mkinitcpio.conf
+}
+
+function select_swap_disk_uuid(){
+  local swap_disks
+  readarray -t swap_disks <<< "$(lsblk -lo NAME,UUID,FSTYPE | grep -i 'swap')"
+
+  if (( ${#swap_disks[@]} == 0)); then
+    echo "Error: No swap disks found" >&2
+    return 1
+  fi
+
+  local counter
+  local disk
+  counter=0
+  for disk in "${swap_disks[@]}"; do
+    echo "$counter) $disk"
+    counter=$((counter+1))
+  done
+
+  local swap_disk_index
+  swap_disk_index=0
+  if (( ${#swap_disks[@]} > 1)); then
+      read -r -p "Select swap disk: " swap_disk_index
+  fi
+
+  if [[ "$swap_disk_index" =~ ^[0-9]+$ ]] && (( "$swap_disk_index" < "${#swap_disks[@]}" )); then
+    echo "${swap_disks[$swap_disk_index]}" | cut -d' ' -f2
+  else
+    return 1
+  fi
+
+}
+export -f select_swap_disk_uuid
+
+function add_resume_device_to_kernel(){
+  local resume_device
+  while ! resume_device=$(select_swap_disk_uuid); do
+    echo "Error: Failed to select swap disk" >&2
+  done
+
+  echo "Selected swap disk UUID: $resume_device"
+  sleep 2
+  sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ resume=UUID=$resume_device\"/" /etc/default/grub
+}
+export -f add_resume_device_to_kernel
