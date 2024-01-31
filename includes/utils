@@ -126,7 +126,7 @@ function add_resume_device_to_kernel(){
 
   echo "Selected swap disk UUID: $resume_device"
   sleep 2
-  sudo sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ resume=UUID=$resume_device\"/" /etc/default/grub
+  sudo sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"$/ resume=UUID=$resume_device\"/" /etc/default/grub
 }
 export -f add_resume_device_to_kernel
 
