@@ -151,7 +151,7 @@ Word Completion Remove Tail=true
 
 [KTextEditor::Search]
 Replace History=wsbind
-Search History=right,workspace
+Search History=return,right,workspace
 
 [Konsole]
 AutoSyncronize=true

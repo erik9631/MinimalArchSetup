@@ -47,7 +47,7 @@ function update_mkinitcpio(){
       echo "$module is already set in /etc/modules-load.d/modules.conf" >&2
       continue
     fi
-      sed -i "/^MODULES=/s/\$)/ $module\)" /etc/mkinitcpio.conf
+      sed -i "/^MODULES=/s/)$/ $module)/" /etc/mkinitcpio.conf
       modules_updated=1
   done
 
