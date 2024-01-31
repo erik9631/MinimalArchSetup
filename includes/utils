@@ -88,7 +88,9 @@ function add_initramfs_resume_hook(){
 
 function select_swap_disk_uuid(){
   local swap_disks
+  IFS=$'\n'i
   readarray -t swap_disks <<< "$(lsblk -lo NAME,UUID,FSTYPE | grep -i 'swap')"
+  unset IFS
 
   if (( ${#swap_disks[@]} == 0)); then
     echo "Error: No swap disks found" >&2
@@ -99,7 +101,7 @@ function select_swap_disk_uuid(){
   local disk
   counter=0
   for disk in "${swap_disks[@]}"; do
-    echo "$counter) $disk"
+    echo "$counter) $disk" >&2
     counter=$((counter+1))
   done
 
