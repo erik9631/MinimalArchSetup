@@ -62,7 +62,7 @@ for ((i=0; i<${#args[@]}; i++)); do
         fi
         exit 0
       ;;
-      --add_hibernation)
+      --add_hibernate)
         # The resume hook is used for hibernation
         add_initramfs_resume_hook
         if ! grep -qE '^HOOKS=.*resume' /etc/mkinitcpio.conf; then
