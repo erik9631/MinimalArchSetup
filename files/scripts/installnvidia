@@ -27,7 +27,7 @@ function update_grub(){
   fi
 
   sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ nvidia_drm.modeset=1\"/" /etc/default/grub
-  if grub-mkconfig -o /boot/grub/grub.cfg; then
+  if sudo grub-mkconfig -o /boot/grub/grub.cfg; then
     echo "GRUB configuration generated successfully." >&2
   else
     echo "Fatal error! GRUB configuration generation failed." >&2
@@ -47,7 +47,7 @@ function update_mkinitcpio(){
       echo "$module is already set in /etc/modules-load.d/modules.conf" >&2
       continue
     fi
-      sed -i "/^MODULES=/s/)$/ $module)/" /etc/mkinitcpio.conf
+      sudo sed -i "/^MODULES=/s/)$/ $module)/" /etc/mkinitcpio.conf
       modules_updated=1
   done
 
@@ -55,7 +55,7 @@ function update_mkinitcpio(){
     return 0
   fi
 
-  if mkinitcpio -P; then
+  if sudo mkinitcpio -P; then
     echo "Linux initramfs generated successfully." >&2
   else
     echo "Fatal error! Linux initramfs generation failed." >&2

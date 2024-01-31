@@ -235,9 +235,13 @@ stage_two(){
     exit 1
   fi
 
+  if ! apply_gtk_theme; then
+    echo "Applying gtk theme failed." >&2
+    exit 1
+  fi
+
     # The resume hook is used for hibernation
-  add_initramfs_resume_hook
-  if ! grep -qE '^HOOKS=.*resume' /etc/mkinitcpio.conf; then
+  if ! add_initramfs_resume_hook; then
     echo "Failed to add resume hook to mkinitcpio.conf" >&2
     exit 1
   fi

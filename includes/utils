@@ -79,7 +79,11 @@ function install_model_packages(){
 export -f install_model_packages
 
 function add_initramfs_resume_hook(){
-  sed -i '/^HOOKS=/s/)$/ resume)/' /etc/mkinitcpio.conf
+  sudo sed -i '/^HOOKS=/s/)$/ resume)/' /etc/mkinitcpio.conf
+  if ! sudo mkinitcpio -P; then
+    echo "Fatal error. Failed to update initramfs" >&2
+    return 1
+  fi
 }
 
 function select_swap_disk_uuid(){
@@ -122,7 +126,7 @@ function add_resume_device_to_kernel(){
 
   echo "Selected swap disk UUID: $resume_device"
   sleep 2
-  sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ resume=UUID=$resume_device\"/" /etc/default/grub
+  sudo sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ resume=UUID=$resume_device\"/" /etc/default/grub
 }
 export -f add_resume_device_to_kernel
 
