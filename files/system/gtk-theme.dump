@@ -1,0 +1,13 @@
+[/]
+color-scheme='default'
+cursor-size=24
+cursor-theme='Adwaita'
+font-antialiasing='grayscale'
+font-hinting='slight'
+font-name='Cantarell 11'
+font-rgba-order='rgb'
+gtk-theme='Catppuccin-Mocha-Standard-Blue-Dark'
+icon-theme='Papirus-Dark'
+text-scaling-factor=1.0
+toolbar-icons-size='large'
+toolbar-style='both-horiz'

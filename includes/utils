@@ -125,3 +125,10 @@ function add_resume_device_to_kernel(){
   sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ resume=UUID=$resume_device\"/" /etc/default/grub
 }
 export -f add_resume_device_to_kernel
+
+function apply_gtk_theme(){
+  if ! dconf load /org/gnome/desktop/interface/ < "$SCRIPT_DIR"/files/system/gtk-theme.dump; then
+    echo "Error: Failed to apply GTK theme" >&2
+    return 1
+  fi
+}

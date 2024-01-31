@@ -52,17 +52,6 @@ stage_zero(){
 	exit 1
   fi
 
-  # The resume hook is used for hibernation
-  add_initramfs_resume_hook
-  if ! grep -qE '^HOOKS=.*resume' /etc/mkinitcpio.conf; then
-    echo "Failed to add resume hook to mkinitcpio.conf" >&2
-    exit 1
-  fi
-
-  # Tells the kernel which swap partition is used for hibernation
-  add_resume_device_to_kernel
-
-
   # Install the linux zen-kernel with firmware
   if (("$shared_boot" == 1)); then
     if ! pacstrap /mnt base linux-firmware; then
@@ -241,15 +230,20 @@ stage_two(){
     exit 1
   fi
 
-  if ! copy_home; then
-    echo "Copying home directory failed" >&2
-    exit 1
-  fi
-
   if ! copy_dots; then
     echo "Copying modrpobe failed." >&2
     exit 1
   fi
+
+    # The resume hook is used for hibernation
+  add_initramfs_resume_hook
+  if ! grep -qE '^HOOKS=.*resume' /etc/mkinitcpio.conf; then
+    echo "Failed to add resume hook to mkinitcpio.conf" >&2
+    exit 1
+  fi
+
+  # Tells the kernel which swap partition is used for hibernation
+  add_resume_device_to_kernel
 
   echo "Performing cleanup..."
   sudo rm -rf /opt/install
