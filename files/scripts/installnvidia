@@ -1,0 +1,84 @@
+#!/bin/bash
+function install_nvidia_driver(){
+  local path
+  path=$1
+  if pgrep -Qi "hyprland"; then
+    echo "hyprland is running. Please exit hyprland before installing nvidia driver." >&2
+    return 1
+  fi
+
+  if ! test -f "$path"; then
+    echo "Invalid driver file path" >&2
+    return 1
+  fi
+
+  if ! path; then
+    echo "Installing nvidia driver failed." >&2
+    return 1
+  fi
+
+}
+
+function update_grub(){
+  # Check if modset is already set
+  if grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
+    echo "nvidia_drm.modeset=1 is already set in /etc/default/grub" >&2
+    return 0
+  fi
+
+  sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ nvidia_drm.modeset=1\"/" /etc/default/grub
+  if grub-mkconfig -o /boot/grub/grub.cfg; then
+    echo "GRUB configuration generated successfully." >&2
+  else
+    echo "Fatal error! GRUB configuration generation failed." >&2
+    return 1
+  fi
+}
+
+function update_mkinitcpio(){
+  local nvidia_modules
+  local module
+  local modules_updated
+  modules_updated=0
+  nvidia_modules="nvidia nvidia_modeset nvidia_uvm nvidia_drm"
+
+  for module in $nvidia_modules; do
+    if grep -q "$module" /etc/modules-load.d/modules.conf; then
+      echo "$module is already set in /etc/modules-load.d/modules.conf" >&2
+      continue
+    fi
+      sed -i "/^MODULES=/s/\$)/ $module\)" /etc/mkinitcpio.conf
+      modules_updated=1
+  done
+
+  if (( ! modules_updated )); then
+    return 0
+  fi
+
+  if mkinitcpio -P; then
+    echo "Linux initramfs generated successfully." >&2
+  else
+    echo "Fatal error! Linux initramfs generation failed." >&2
+    return 1
+  fi
+}
+
+if ! install_nvidia_driver $1; then
+  echo "Fatal error! Failed to install nvidia driver." >&2
+  exit 1
+fi
+
+if ! update_grub; then
+  echo "Fatal error! Failed to update grub." >&2
+  exit 1
+fi
+
+if ! update_mkinitcpio; then
+  echo "Fatal error! Failed to update mkinitcpio." >&2
+  exit 1
+fi
+
+echo "Nvidia driver installed successfully. Rebooting sytem..." >&2
+sleep 5
+reboot
+

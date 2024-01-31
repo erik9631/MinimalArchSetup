@@ -80,6 +80,12 @@ export -f install_model_packages
 
 function add_initramfs_resume_hook(){
   sed -i '/^HOOKS=/s/\$)/ resume\)' /etc/mkinitcpio.conf
+  if mkinitcpio -P; then
+      echo "Linux initramfs generated successfully."
+    else
+      echo "Fatal error! Linux initramfs generation failed." >&2
+      exit 1
+  fi
 }
 
 function select_swap_disk_uuid(){

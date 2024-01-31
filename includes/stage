@@ -1,7 +1,6 @@
 #!/bin/bash
 
 #TODO
-# Add hibernation grub config and modify initramfs config to include the resume hook
 # Add nvidia drivers script
 
 # shellcheck source=network
