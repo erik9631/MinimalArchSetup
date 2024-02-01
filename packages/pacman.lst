@@ -37,12 +37,14 @@ polkit-kde-agent # Authentication Agent asking you for a password whenever an ap
 avahi # Network discovery
 cups # Printing
 nss-mdns # mDNS support for avahi
+smbclient # To access samba shares (Like windows shared folders...)
 
 # Visual
 waybar
 papirus-icon-theme
 nerd-fonts
 kvantum
+vlc # Vlc player for videos
 
 # Libs
 qt5ct
