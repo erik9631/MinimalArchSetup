@@ -146,7 +146,7 @@ export -f apply_gtk_theme
 
 function add_mdns_to_nsswitch(){
 
-  if grep -q 'mdns_minimal' /etc/nsswitch.conf; then
+  if ! grep -q 'mdns_minimal' /etc/nsswitch.conf; then
     echo "mdns_minimal already in nsswitch!" >&2
     return 0
   fi

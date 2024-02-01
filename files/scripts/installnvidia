@@ -62,6 +62,27 @@ function update_mkinitcpio(){
     return 1
   fi
 }
+function update_hyprland_env(){
+
+  if ! grep -ip "LIBVA_DRIVER_NAME" "$HOME"/.config/hypr/.env; then
+    echo "hyprland env is already set" >&2
+    return 0
+  fi
+
+  echo "env = LIBVA_DRIVER_NAME,nvidia
+env = XDG_SESSION_TYPE,wayland
+env = GBM_BACKEND,nvidia-drm
+env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+env = WLR_NO_HARDWARE_CURSORS,1" >> "$HOME"/.config/hypr/.env
+
+  echo "env = LIBVA_DRIVER_NAME,nvidia
+env = XDG_SESSION_TYPE,wayland
+env = GBM_BACKEND,nvidia-drm
+env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+env = WLR_NO_HARDWARE_CURSORS,1" >> /etc/skel/.config/hypr/.env
+
+  echo "hyprland env updated successfully." >&2
+}
 
 if ! install_nvidia_driver $1; then
   echo "Fatal error! Failed to install nvidia driver." >&2
@@ -75,6 +96,11 @@ fi
 
 if ! update_mkinitcpio; then
   echo "Fatal error! Failed to update mkinitcpio." >&2
+  exit 1
+fi
+
+if ! update_hyprland_env; then
+  echo "Fatal error! Failed to update hyprland env." >&2
   exit 1
 fi
 
