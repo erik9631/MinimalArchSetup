@@ -142,3 +142,18 @@ function apply_gtk_theme(){
     return 1
   fi
 }
+export -f apply_gtk_theme
+
+function add_mdns_to_nsswitch(){
+
+  if grep -q 'mdns_minimal' /etc/nsswitch.conf; then
+    echo "mdns_minimal already in nsswitch!" >&2
+    return 0
+  fi
+
+  if ! sudo sed -i '/^hosts:/s/mymachines/mymachines mdns_minimal [NOTFOUND=return]/' /etc/nsswitch.conf; then
+    echo "Error: Failed to add mdns to nsswitch" >&2
+    return 1
+  fi
+}
+export -f add_mdns_to_nsswitch

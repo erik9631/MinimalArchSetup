@@ -240,12 +240,18 @@ stage_two(){
     exit 1
   fi
 
+  if ! add_mdns_to_nsswitch; then
+    echo "Failed to add mdns to nsswitch.conf" >&2
+    exit 1
+  fi
+
   systemctl enable --user --now pipewire
   systemctl enable --user --now pipewire-pulse
   systemctl enable --user --now wireplumber
   systemctl enable --now bluetooth
   systemctl enable tlp
   systemctl enable --now avahi-daemon
+  systemctl enable --now cups
 
   # Tells the kernel which swap partition is used for hibernation
   add_resume_device_to_kernel
