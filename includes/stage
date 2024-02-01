@@ -245,6 +245,7 @@ stage_two(){
   systemctl enable --user --now wireplumber
   systemctl enable --now bluetooth
   systemctl enable tlp
+  systemctl enable --now avahi-daemon
 
   # Tells the kernel which swap partition is used for hibernation
   add_resume_device_to_kernel
