@@ -89,7 +89,7 @@ function add_initramfs_resume_hook(){
 function select_swap_disk_uuid(){
   local swap_disks
   IFS=$'\n'i
-  readarray -t swap_disks <<< "$(lsblk -lo NAME,UUID,FSTYPE | grep -i 'swap')"
+  readarray -t swap_disks <<< "$(lsblk -lo NAME,UUID,FSTYPE | grep -i 'swap' | tr -s ' ')"
   unset IFS
 
   if (( ${#swap_disks[@]} == 0)); then
@@ -129,6 +129,10 @@ function add_resume_device_to_kernel(){
   echo "Selected swap disk UUID: $resume_device"
   sleep 2
   sudo sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"$/ resume=UUID=$resume_device\"/" /etc/default/grub
+  if ! sudo grub-mkconfig -o /boot/grub/grub.cfg; then
+    echo "Error: Failed to update grub config" >&2
+    return 1
+  fi
 }
 export -f add_resume_device_to_kernel
 

@@ -197,12 +197,6 @@ stage_one(){
     exit 1
   fi
 
-  systemctl enable --user --now pipewire
-  systemctl enable --user --now pipewire-pulse
-  systemctl enable --user --now wireplumber
-  systemctl enable --now bluetooth
-  systemctl enable tlp
-
   echo "Updating stage file..."
   sudo mv /var/install/stage1 /var/install/stage2
 
@@ -245,6 +239,12 @@ stage_two(){
     echo "Failed to add resume hook to mkinitcpio.conf" >&2
     exit 1
   fi
+
+  systemctl enable --user --now pipewire
+  systemctl enable --user --now pipewire-pulse
+  systemctl enable --user --now wireplumber
+  systemctl enable --now bluetooth
+  systemctl enable tlp
 
   # Tells the kernel which swap partition is used for hibernation
   add_resume_device_to_kernel

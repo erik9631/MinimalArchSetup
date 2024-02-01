@@ -62,18 +62,21 @@ for ((i=0; i<${#args[@]}; i++)); do
         fi
         exit 0
       ;;
-      --add_hibernate)
+      --add_hibernate_kernel)
+        # Tells the kernel which swap partition is used for hibernation
+        add_resume_device_to_kernel
+        exit 0
+      ;;
+      --add_hibernate_hook)
         # The resume hook is used for hibernation
         add_initramfs_resume_hook
         if ! grep -qE '^HOOKS=.*resume' /etc/mkinitcpio.conf; then
           echo "Failed to add resume hook to mkinitcpio.conf" >&2
           exit 1
         fi
-
-        # Tells the kernel which swap partition is used for hibernation
-        add_resume_device_to_kernel
         exit 0
       ;;
+
       --help)
         echo "Usage: $0 [--stage <0,1,2>] [--shared_boot] [--best_display_config] [--handle_internet_connection]"
         exit 0
