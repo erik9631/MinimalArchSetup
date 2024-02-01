@@ -12,4 +12,15 @@
 	<startup-notify/>
 	<directories/>
 </action>
+<action>
+	<icon>thunar</icon>
+	<name>Open as root</name>
+	<submenu></submenu>
+	<unique-id>1706811219031378-1</unique-id>
+	<command>sudo -E thunar %f</command>
+	<description>Opens the selected folder as root</description>
+	<range>*</range>
+	<patterns>*</patterns>
+	<directories/>
+</action>
 </actions>

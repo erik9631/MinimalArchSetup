@@ -9,6 +9,7 @@ bluez
 bluez-utils
 networkmanager
 git
+man
 
 [stage1]
 wayland # Display server
@@ -55,6 +56,7 @@ ghostscript # Used by cups and needed for printing
 
 # Gui Apps
 thunar
+xarchiver
 thunar-archive-plugin
 kate
 pavucontrol
