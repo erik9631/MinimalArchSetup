@@ -26,7 +26,6 @@ gvfs # Virtual filesystem for thunar
 thunar-volman # Automounting for thunar
 swayidle # Idle manager
 tlp # Power management
-xwaylandvideobridge # Screen sharing for entire screen not just windows
 
 # Daemons
 dunst #Notification daemon

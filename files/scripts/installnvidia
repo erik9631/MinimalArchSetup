@@ -84,6 +84,16 @@ env = WLR_NO_HARDWARE_CURSORS,1" >> /etc/skel/.config/hypr/.env
   echo "hyprland env updated successfully." >&2
 }
 
+function update_mod_probe(){
+  if ! grep -q "nvidia" /etc/modprobe.d/nvidia.conf; then
+    echo "nvidia is already set in /etc/modprobe.d/nvidia.conf" >&2
+    return 0
+  fi
+
+  echo "options nvidia-drm modeset=1" > /etc/modprobe.d/nvidia.conf
+  echo "modprobe updated successfully." >&2
+}
+
 if ! install_nvidia_driver $1; then
   echo "Fatal error! Failed to install nvidia driver." >&2
   exit 1
@@ -101,6 +111,11 @@ fi
 
 if ! update_hyprland_env; then
   echo "Fatal error! Failed to update hyprland env." >&2
+  exit 1
+fi
+
+if ! update_mod_probe; then
+  echo "Fatal error! Failed to update modprobe." >&2
   exit 1
 fi
 
