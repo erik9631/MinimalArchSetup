@@ -53,6 +53,7 @@ qt6ct
 fuse2 # Mandatory lib for running fuse based apps
 python-dbus # Used by avahi-discover
 ghostscript # Used by cups and needed for printing
+nvidia-dkms # Nvidia dynamic kernel driver module
 
 # Gui Apps
 thunar

@@ -1,21 +1,12 @@
 #!/bin/bash
 function install_nvidia_driver(){
-  local path
-  path=$1
   if pgrep -Qi "hyprland"; then
     echo "hyprland is running. Please exit hyprland before installing nvidia driver." >&2
     return 1
   fi
 
-  if ! test -f "$path"; then
-    echo "Invalid driver file path" >&2
-    return 1
-  fi
-
-  if ! path; then
-    echo "Installing nvidia driver failed." >&2
-    return 1
-  fi
+  sudo pacman -S --noconfirm nvidia-dkms nvidia-utils lib32-nvidia-utils
+  yay -S --noconfirm nvidia-settings
 
 }
 
@@ -50,6 +41,8 @@ function update_mkinitcpio(){
       sudo sed -i "/^MODULES=/s/)$/ $module)/" /etc/mkinitcpio.conf
       modules_updated=1
   done
+
+  sudo sed -i "/^HOOKS=/s/kms//" /etc/mkinitcpio.conf
 
   if (( ! modules_updated )); then
     return 0
@@ -94,7 +87,7 @@ function update_mod_probe(){
   echo "modprobe updated successfully." >&2
 }
 
-if ! install_nvidia_driver $1; then
+if ! install_nvidia_driver; then
   echo "Fatal error! Failed to install nvidia driver." >&2
   exit 1
 fi
