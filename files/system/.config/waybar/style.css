@@ -18,7 +18,7 @@ window#waybar {
 }
 
 #workspaces {
-    background-color: rgba(10, 10, 24, 0.8);
+    background-color: rgba(10, 10, 24, 0.6);
     border-radius: 8px 8px 8px 8px; /* Top-left, top-right, bottom-right, bottom-left */
     padding-left: 5px;
     padding-right: 5px;
@@ -37,7 +37,7 @@ window#waybar {
     padding-left: 10px;
     padding-right: 10px;
 
-    background-color: rgba(10, 10, 24, 0.8);
+    background-color: rgba(10, 10, 24, 0.6);
     margin-top: 5px;
 }
 

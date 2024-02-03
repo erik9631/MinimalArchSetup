@@ -1,0 +1,8 @@
+{
+	"theme": "auto",
+	"ignored_packages":
+	[
+		"Vintage",
+	],
+	"color_scheme": "Catppuccin Mocha.sublime-color-scheme",
+}

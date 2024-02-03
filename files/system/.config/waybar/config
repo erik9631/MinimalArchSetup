@@ -11,14 +11,6 @@
     "modules-right": ["pulseaudio", "backlight", "tray", "clock"],
     // Modules configuration
     "hyprland/workspaces": {
-            "persistent-workspaces": {
-            "1": [],
-            "2": [],
-            "3": [],
-            "4": [],
-            "5": [],
-            "6": [],
-        },
          "disable-scroll": true,
          "all-outputs": true,
          "warp-on-scroll": false,
