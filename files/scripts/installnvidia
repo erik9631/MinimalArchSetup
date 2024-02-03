@@ -4,9 +4,19 @@ function install_nvidia_driver(){
     echo "hyprland is running. Please exit hyprland before installing nvidia driver." >&2
     return 1
   fi
+  if ! sudo pacman -S --noconfirm linux-zen-headers; then
+    echo "Fatal error! Failed to install linux-zen-headers." >&2
+    return 1
+  fi
+  if ! yay -S nvidia-dkms nvidia-utils lib32-nvidia-utils; then
+    echo "Fatal error! Failed to install nvidia-dkms." >&2
+    return 1
+  fi
 
-  sudo pacman -S --noconfirm nvidia-dkms nvidia-utils lib32-nvidia-utils
-  yay -S --noconfirm nvidia-settings
+  if ! yay -S --noconfirm nvidia-settings; then
+    echo "Fatal error! Failed to install nvidia-settings." >&2
+    return 1
+  fi
 
 }
 
@@ -17,12 +27,12 @@ function update_grub(){
     return 0
   fi
 
-  sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ nvidia_drm.modeset=1\"/" /etc/default/grub
+  sudo sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/s/\"\$/ nvidia_drm.modeset=1\"/" /etc/default/grub
   if sudo grub-mkconfig -o /boot/grub/grub.cfg; then
     echo "GRUB configuration generated successfully." >&2
   else
     echo "Fatal error! GRUB configuration generation failed." >&2
-    return 1
+     return 1
   fi
 }
 
@@ -34,8 +44,8 @@ function update_mkinitcpio(){
   nvidia_modules="nvidia nvidia_modeset nvidia_uvm nvidia_drm"
 
   for module in $nvidia_modules; do
-    if grep -q "$module" /etc/modules-load.d/modules.conf; then
-      echo "$module is already set in /etc/modules-load.d/modules.conf" >&2
+    if grep -q "$module" /etc/mkinitcpio.conf; then
+      echo "$module is already set in /etc/mkinitcpio.conf" >&2
       continue
     fi
       sudo sed -i "/^MODULES=/s/)$/ $module)/" /etc/mkinitcpio.conf
@@ -57,7 +67,7 @@ function update_mkinitcpio(){
 }
 function update_hyprland_env(){
 
-  if ! grep -ip "LIBVA_DRIVER_NAME" "$HOME"/.config/hypr/.env; then
+  if grep -i "LIBVA_DRIVER_NAME" "$HOME"/.config/hypr/.env; then
     echo "hyprland env is already set" >&2
     return 0
   fi
@@ -77,42 +87,28 @@ env = WLR_NO_HARDWARE_CURSORS,1" >> /etc/skel/.config/hypr/.env
   echo "hyprland env updated successfully." >&2
 }
 
-function update_mod_probe(){
-  if ! grep -q "nvidia" /etc/modprobe.d/nvidia.conf; then
-    echo "nvidia is already set in /etc/modprobe.d/nvidia.conf" >&2
-    return 0
-  fi
+#if ! install_nvidia_driver; then
+#  echo "Fatal error! Failed to install nvidia driver." >&2
+#  exit 1
+#fi
 
-  echo "options nvidia-drm modeset=1" > /etc/modprobe.d/nvidia.conf
-  echo "modprobe updated successfully." >&2
-}
 
-if ! install_nvidia_driver; then
-  echo "Fatal error! Failed to install nvidia driver." >&2
-  exit 1
-fi
+#if ! update_grub; then
+#  echo "Fatal error! Failed to update grub." >&2
+#  exit 1
+#fi
 
-if ! update_grub; then
-  echo "Fatal error! Failed to update grub." >&2
-  exit 1
-fi
-
-if ! update_mkinitcpio; then
-  echo "Fatal error! Failed to update mkinitcpio." >&2
-  exit 1
-fi
+#if ! update_mkinitcpio; then
+#  echo "Fatal error! Failed to update mkinitcpio." >&2
+#  exit 1
+#fi
 
 if ! update_hyprland_env; then
   echo "Fatal error! Failed to update hyprland env." >&2
-  exit 1
+   exit 1
 fi
 
-if ! update_mod_probe; then
-  echo "Fatal error! Failed to update modprobe." >&2
-  exit 1
-fi
-
-echo "Nvidia driver installed successfully. Rebooting sytem..." >&2
-sleep 5
-reboot
+#echo "Nvidia driver installed successfully. Rebooting sytem..." >&2
+#sleep 5
+#reboot
 

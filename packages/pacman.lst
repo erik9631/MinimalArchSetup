@@ -34,7 +34,6 @@ pipewire-pulse # Pulseaudio support for pipewire
 pipewire-jack # Jack support for pipewire
 pipewire-alsa # Alsa support for pipewire
 xdg-desktop-portal-hyprland # It’s used for stuff like e.g. opening file pickers, screen sharing.
-polkit-kde-agent # Authentication Agent asking you for a password whenever an app wants to elevate its privileges.
 avahi # Network discovery
 cups # Printing
 nss-mdns # mDNS support for avahi
