@@ -1,7 +1,6 @@
 * {
     /* `otf-font-awesome` is required to be installed for icons */
     font-family: FontAwesome, sans-serif;
-    font-size: 13px;
 }
 
 window#waybar {
@@ -9,11 +8,17 @@ window#waybar {
 }
 
 #workspaces button {
-    padding: 0 5px;
+    font-size: 16px;
+    padding-right: 2px;
+    padding-left: 4px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 #workspaces button:hover {
-    background: rgba(100, 100, 100, 0.15);
+    box-shadow: inherit;
+    text-shadow: inherit;
+    font-size: 24px;
     border-radius: 2px;
 }
 
@@ -34,6 +39,7 @@ window#waybar {
 #network,
 #tray,
 #pulseaudio {
+    font-size: 12px;
     padding-left: 10px;
     padding-right: 10px;
 
