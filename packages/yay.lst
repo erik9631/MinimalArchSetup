@@ -8,7 +8,7 @@ nwg-displays # Display manager
 swaylock-effects # Lockscreen
 wlr-randr # Manages outputs from wayland. Depedency for nwg-displays
 google-chrome # Browser
-tlpui # powermanagment UI
+tlpui # powermanagment UII
 rofi-lbonn-wayland-git # Rofi wayland fork
 catppuccin-gtk-theme-mocha
 onedrive-abraunegg # Onedrive client
